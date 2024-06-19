@@ -1,5 +1,6 @@
-import {Alert, FlatList, StyleSheet, View} from 'react-native';
+import {Alert, FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useState, useEffect} from 'react';
+import {launchImageLibrary, launchCamera, ImageLibraryOptions} from 'react-native-image-picker';
 import {
   ButtonText,
   Card,
@@ -24,6 +25,7 @@ export default function AddUser({navigation, route}: any) {
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
   const {mode,  item} = route.params;
+  const [imageUri, setImageUri] = useState(null);
 
 
   const handlePhoneNumberChange = text => {
@@ -80,14 +82,43 @@ export default function AddUser({navigation, route}: any) {
     }
   };
 
+
+  const handleChoosePhoto = () => {
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
+      quality: 1,
+    };
+    launchImageLibrary(options, (response:any) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorMessage) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+      } else {
+        const uri = response.uri || response.assets[0].uri;
+        setImageUri(uri);
+      }
+    });
+  };
+  
+
   return (
     <GluestackUIProvider config={config}>
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.mainContainer}>
           <Card size="lg" variant="elevated" m="$3">
             <Heading mb="$5" fontSize={30} alignSelf="center">
-              {mode ? 'Edit User' : 'Add User'}
+              {mode && mode === 'Edit user' ? 'Edit user': 'Add user' }
             </Heading>
+
+            <TouchableOpacity onPress={handleChoosePhoto} style={styles.imagePicker}>
+            <View style={styles.imageContainer}>
+              {imageUri ? (
+                <Image source={{uri: imageUri}} style={styles.image} />
+              ) : (
+                <Text>Select a Photo</Text>
+              )}
+            </View>
+          </TouchableOpacity>
 
             <Input
               variant="rounded"
@@ -157,7 +188,7 @@ export default function AddUser({navigation, route}: any) {
               alignSelf="center"
               borderRadius={20}
               onPress={handleSignup}>
-              <ButtonText>{mode ? 'Edit user' : 'Add user'}</ButtonText>
+              <ButtonText>{mode && mode === 'Edit user' ? 'Edit user': 'Add user' }</ButtonText>
             </Button>
           </Card>
           {/* <HStack alignSelf="center">
@@ -177,5 +208,23 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     justifyContent: 'center',
+  },
+
+  imagePicker: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  imageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#e1e1e1',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
 });

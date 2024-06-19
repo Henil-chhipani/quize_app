@@ -38,7 +38,7 @@ export default function Admin({navigation}:any)  {
           borderRadius={15}
           margin={20}
           onPress={()=>{
-            navigation.navigate('AddUser')
+            navigation.navigate('AddUser',{mode:'Add user',item: null})
           }}
           >
           <ButtonText>Create User</ButtonText>
