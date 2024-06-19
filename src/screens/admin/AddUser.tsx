@@ -10,47 +10,75 @@ import {
   InputField,
   Text,
   HStack,
-  LinkText,Link,
+  LinkText,
+  Link,
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import { insertUser, getUserByEmail} from '../database/database';
+import {insertUser,updateUser} from '../../database/database';
 
-export default function Signup({navigation}:any) {
+export default function AddUser({navigation, route}: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
-
+  const {mode,  item} = route.params;
 
 
   const handlePhoneNumberChange = text => {
-  
     const numericText = text.replace(/[^0-9]/g, '');
     setPhoneNumber(numericText);
   };
 
- 
-    const handleSignup = async () => {
-      if (name && email && phoneNumber && password) {
-        await insertUser(name, email, phoneNumber, password);
+  useEffect(() => {
+    if (route.params && route.params.item) {
+      const {name, email, phone, password} = route.params.item;
+      setName(name);
+      setEmail(email);
+      setPhoneNumber(phone);
+      setPassword(password);
+    }
+
+
+  }, [route.params]);
+
+  const handleSignup = async () => {
+    if (name && email && phoneNumber && password) {
+      if (mode == 'Edit user') {
+
+        await updateUser(name,email,phoneNumber,password,route.params.item.id)
         Alert.alert(
-          "Registration Successful",
-          "You have successfully signed up. Please log in.",
+          'Updated',
+          'User updated successfully',
           [
             {
-              text: "OK",
-              onPress: () => navigation.navigate('Login')
-            }
-          ]
+              text: 'OK',
+              onPress: () => navigation.replace('UserDetails'),
+            },
+          ],
         );
-        console.log('User signed up successfully');
-      } else {
-        console.log('Please fill all fields');
-      }
-    };
 
+      }
+      
+      else {
+        await insertUser(name, email, phoneNumber, password);
+        Alert.alert(
+          'Registration Successful',
+          'You have successfully signed up. Please log in.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Admin'),
+            },
+          ],
+        );
+        console.log('User Added up successfully');
+      }
+    } else {
+      console.log('Please fill all fields');
+    }
+  };
 
   return (
     <GluestackUIProvider config={config}>
@@ -58,7 +86,7 @@ export default function Signup({navigation}:any) {
         <View style={styles.mainContainer}>
           <Card size="lg" variant="elevated" m="$3">
             <Heading mb="$5" fontSize={30} alignSelf="center">
-              Signup
+              {mode ? 'Edit User' : 'Add User'}
             </Heading>
 
             <Input
@@ -129,16 +157,16 @@ export default function Signup({navigation}:any) {
               alignSelf="center"
               borderRadius={20}
               onPress={handleSignup}>
-              <ButtonText>Signup </ButtonText>
+              <ButtonText>{mode ? 'Edit user' : 'Add user'}</ButtonText>
             </Button>
           </Card>
-          <HStack alignSelf="center">
+          {/* <HStack alignSelf="center">
   <Text size="lg">Already have account </Text>
   
   <Link onPress={() => navigation.navigate('Login')} isExternal>
     <LinkText size="lg">Login</LinkText>
   </Link>
-</HStack>
+</HStack> */}
         </View>
       </SafeAreaView>
     </GluestackUIProvider>

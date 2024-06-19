@@ -18,7 +18,7 @@ import {
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 
-export default function Admin() {
+export default function Admin({navigation}:any)  {
   return (
     <GluestackUIProvider config={config}>
       <Card size="md" variant="elevated" m="$3" backgroundColor="$green50">
@@ -36,7 +36,11 @@ export default function Admin() {
           isFocusVisible={false}
           marginVertical={10}
           borderRadius={15}
-          margin={20}>
+          margin={20}
+          onPress={()=>{
+            navigation.navigate('AddUser')
+          }}
+          >
           <ButtonText>Create User</ButtonText>
           <ButtonIcon as={AddIcon} />
         </Button>
@@ -48,6 +52,9 @@ export default function Admin() {
           size="md"
           variant="solid"
           action="primary"
+          onPress={()=>{
+            navigation.navigate('UserDetails')
+          }}
           isDisabled={false}
           isFocusVisible={false}>
           <ButtonText>User Details</ButtonText>

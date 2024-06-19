@@ -3,37 +3,87 @@ import SQLite from 'react-native-sqlite-storage';
 SQLite.DEBUG(true);
 SQLite.enablePromise(true);
 
-const database_name = 'quize_db';
+const database_name = 'quize.db';
 const database_version = '1.0';
 const database_displayname = 'SQLite quize Database';
 const database_size = 200000;
 
 let db: any;
 
+// export const initDatabase = async () => {
+//   try {  
+//     db = SQLite.openDatabase(
+//       database_name,
+//       database_version,
+//       database_displayname,
+//       database_size,
+//     );
+//     console.log('Database opened');
+
+//     db.then(tx => {
+//       tx.executeSql(
+//         'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT)',
+//       );
+      
+//       tx.executeSql(
+//         'CREATE TABLE IF NOT EXISTS Qustions (id INTEGER PRIMARY KEY AUTOINCREMENT, qustion TEXT,opt1 TEXT,opt2 TEXT,opt3 TEXT, opt4 TEXT, answer TEXT)',
+//       );
+//     });
+//     console.log('Table created successfully');
+//   } catch (error) {
+//     console.error('Error initializing database: ', error);
+//   }
+// };
+
+
 export const initDatabase = async () => {
-  try {  
-    db = SQLite.openDatabase(
+  try {
+     db = SQLite.openDatabase(
       database_name,
       database_version,
       database_displayname,
-      database_size,
+      database_size
     );
     console.log('Database opened');
 
     db.then(tx => {
       tx.executeSql(
         'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT)',
+        [],
+        () => {
+          console.log('Users table created successfully');
+        },
+        (tx, error: any) => {
+          console.error('Error creating Users table: ', error);
+        }
       );
-      
+
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS Qustions (id INTEGER PRIMARY KEY AUTOINCREMENT, productName TEXT, productPrice TEXT, productDis TEXT, productCategory TEXT, productImg TEXT)',
+        'CREATE TABLE IF NOT EXISTS Questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, opt1 TEXT, opt2 TEXT, opt3 TEXT, opt4 TEXT, answer TEXT)',
+        [],
+        () => {
+          console.log('Questions table created successfully');
+        },
+        (tx, error) => {
+          console.error('Error creating Questions table: ', error);
+        }
       );
+
+
+
+
+    }, (error) => {
+      console.error('Transaction error: ', error);
+    }, () => {
+      console.log('Transaction successful');
     });
-    console.log('Table created successfully');
+
   } catch (error) {
     console.error('Error initializing database: ', error);
   }
+
 };
+
 
 export const insertUser = async (
   name: string,
@@ -43,6 +93,7 @@ export const insertUser = async (
 ) => {
   try {
     const dbInstance = await db;
+    console.log("db instance",dbInstance);
     await dbInstance.executeSql(
       'INSERT INTO Users (name, email, phone, password) VALUES (?, ?, ?, ?)',
       [name, email, phone, password],
@@ -94,10 +145,41 @@ export const getAllUsers = async () => {
     for (let i = 0; i < results[0].rows.length; i++) {
       users.push(results[0].rows.item(i));
     }
+    
     return users;
   } catch (error) {
     console.error('Error fetching users: ', error);
     return [];
+  }
+};
+
+export const updateUser = async (
+  name: string,
+  email: string,
+  phone: string,
+  password: string,
+  id: number,) => {
+  try {
+    const dbInstance = await db;
+    console.log('db instance', dbInstance);
+    await dbInstance.executeSql(
+      'UPDATE Users  SET name = ?, email = ?, phone = ?, password = ? WHERE id = ?',
+      [name, email, phone, password, id],
+    );
+
+    const results = await dbInstance.executeSql(
+      'SELECT * FROM Users WHERE email = ?',
+      [email],
+    );
+
+    if (results[0].rows.length > 0) {
+      const user = results[0].rows.item(0);
+      console.log('User Updated successfully:', user);
+    } else {
+      console.log('User Updated but not found in database.');
+    }
+  } catch (error) {
+    console.error('Error Updateing user: ', error);
   }
 };
 
@@ -122,12 +204,12 @@ export const insertProduct = async (
   try {
     const dbInstance = await db;
     await dbInstance.executeSql(
-      'INSERT INTO Products(productName, productPrice, productDis, productCategory, productImg) VALUES (?,?,?,?,?)',
+      'INSERT INTO Qustions(productName, productPrice, productDis, productCategory, productImg) VALUES (?,?,?,?,?)',
       [productName, productPrice, productDis, productCategory, productImg],
     );
 
     const results = await dbInstance.executeSql(
-      'SELECT * FROM Products WHERE productName = ?',
+      'SELECT * FROM Qustions WHERE QustionId = ?',
       [productName],
     );
 
@@ -146,7 +228,7 @@ export const insertProduct = async (
 export const getAllProducts = async () => {
   try {
     const dbInstance = await db;
-    const results = await dbInstance.executeSql('SELECT * FROM Products');
+    const results = await dbInstance.executeSql('SELECT * FROM Qustions');
     let products = [];
     for (let i = 0; i < results[0].rows.length; i++) {
       products.push(results[0].rows.item(i));
@@ -161,58 +243,16 @@ export const getAllProducts = async () => {
 
 export const get = async()=>{
   const dbInstance = await db;
-  const results  = await dbInstance.executeSql('Truncate table Products')
+  const results  = await dbInstance.executeSql('Truncate table Qustions')
   console.log("data: ",results);
 }
 
 export const deleteProduct = async (id) => {
   try {
     const dbInstance = await db;
-    await dbInstance.executeSql('DELETE FROM Products WHERE id = ?', [id]);
+    await dbInstance.executeSql('DELETE FROM Qustions WHERE id = ?', [id]);
     console.log(`Product with id ${id} deleted successfully`);
   } catch (error) {
     console.error('Error deleting product:', error);
-  }
-};
-
-
-export const insertSampleProducts = async () => {
-  const sampleProducts = [
-    {
-      productName: 'Product 1',
-      productPrice: '10.99',
-      productDis: 'Description for Product 1',
-      productCategory: 'Category 1',
-      productImg: 'https://via.placeholder.com/150',
-    },
-    {
-      productName: 'Product 2',
-      productPrice: '20.99',
-      productDis: 'Description for Product 2',
-      productCategory: 'Category 2',
-      productImg: 'https://via.placeholder.com/150',
-    },
-    {
-      productName: 'Product 3',
-      productPrice: '30.99',
-      productDis: 'Description for Product 3',
-      productCategory: 'Category 3',
-      productImg: 'https://via.placeholder.com/150',
-    },
-  ];
-
-  try {
-    const dbInstance = await db;
-
-    for (const product of sampleProducts) {
-      await dbInstance.executeSql(
-        'INSERT INTO Products (productName, productPrice, productDis, productCategory, productImg) VALUES (?, ?, ?, ?, ?)',
-        [product.productName, product.productPrice, product.productDis, product.productCategory, product.productImg]
-      );
-    }
-
-    console.log('Sample products inserted successfully');
-  } catch (error) {
-    console.error('Error inserting sample products:', error);
   }
 };
