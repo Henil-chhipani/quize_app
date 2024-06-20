@@ -1,6 +1,17 @@
-import {Alert, FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  View,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {launchImageLibrary, launchCamera, ImageLibraryOptions} from 'react-native-image-picker';
+import {
+  launchImageLibrary,
+  launchCamera,
+  ImageLibraryOptions,
+} from 'react-native-image-picker';
 import {
   ButtonText,
   Card,
@@ -16,7 +27,7 @@ import {
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {insertUser,updateUser} from '../../database/database';
+import {insertUser, updateUser} from '../../database/database';
 
 export default function AddUser({navigation, route}: any) {
   const [name, setName] = useState('');
@@ -24,9 +35,8 @@ export default function AddUser({navigation, route}: any) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
-  const {mode,  item} = route.params;
-  const [imageUri, setImageUri] = useState(null);
-
+  const {mode, item} = route.params;
+  const [image, setImage] = useState('');
 
   const handlePhoneNumberChange = text => {
     const numericText = text.replace(/[^0-9]/g, '');
@@ -35,36 +45,34 @@ export default function AddUser({navigation, route}: any) {
 
   useEffect(() => {
     if (route.params && route.params.item) {
-      const {name, email, phone, password} = route.params.item;
+      const {name, email, phone, password, image} = route.params.item;
       setName(name);
       setEmail(email);
       setPhoneNumber(phone);
       setPassword(password);
+      setImage(image);
     }
-
-
   }, [route.params]);
 
   const handleSignup = async () => {
-    if (name && email && phoneNumber && password) {
+    if (name && email && phoneNumber && password && image) {
       if (mode == 'Edit user') {
-
-        await updateUser(name,email,phoneNumber,password,route.params.item.id)
-        Alert.alert(
-          'Updated',
-          'User updated successfully',
-          [
-            {
-              text: 'OK',
-              onPress: () => navigation.replace('UserDetails'),
-            },
-          ],
+        await updateUser(
+          name,
+          email,
+          phoneNumber,
+          password,
+          image,
+          route.params.item.id,
         );
-
-      }
-      
-      else {
-        await insertUser(name, email, phoneNumber, password);
+        Alert.alert('Updated', 'User updated successfully', [
+          {
+            text: 'OK',
+            onPress: () => navigation.replace('UserDetails'),
+          },
+        ]);
+      } else {
+        await insertUser(name, email, phoneNumber, password, image);
         Alert.alert(
           'Registration Successful',
           'You have successfully signed up. Please log in.',
@@ -82,24 +90,25 @@ export default function AddUser({navigation, route}: any) {
     }
   };
 
-
   const handleChoosePhoto = () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
       quality: 1,
+      includeBase64: true,
     };
-    launchImageLibrary(options, (response:any) => {
+    launchImageLibrary(options, (response: any) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const uri = response.uri || response.assets[0].uri;
-        setImageUri(uri);
+// adding base64 image to database 
+        const base64 = response.base64 || response.assets[0].base64;
+        setImage(base64)
+        
       }
     });
   };
-  
 
   return (
     <GluestackUIProvider config={config}>
@@ -107,18 +116,20 @@ export default function AddUser({navigation, route}: any) {
         <View style={styles.mainContainer}>
           <Card size="lg" variant="elevated" m="$3">
             <Heading mb="$5" fontSize={30} alignSelf="center">
-              {mode && mode === 'Edit user' ? 'Edit user': 'Add user' }
+              {mode && mode === 'Edit user' ? 'Edit user' : 'Add user'}
             </Heading>
 
-            <TouchableOpacity onPress={handleChoosePhoto} style={styles.imagePicker}>
-            <View style={styles.imageContainer}>
-              {imageUri ? (
-                <Image source={{uri: imageUri}} style={styles.image} />
-              ) : (
-                <Text>Select a Photo</Text>
-              )}
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleChoosePhoto}
+              style={styles.imagePicker}>
+              <View style={styles.imageContainer}>
+                {image ? (
+                  <Image source={{uri: `data:image/jpeg;base64,${image}`}}  style={styles.image} />
+                ) : (
+                  <Text>Add Photo</Text>
+                )}
+              </View>
+            </TouchableOpacity>
 
             <Input
               variant="rounded"
@@ -188,16 +199,12 @@ export default function AddUser({navigation, route}: any) {
               alignSelf="center"
               borderRadius={20}
               onPress={handleSignup}>
-              <ButtonText>{mode && mode === 'Edit user' ? 'Edit user': 'Add user' }</ButtonText>
+              <ButtonText>
+                {mode && mode === 'Edit user' ? 'Edit user' : 'Add user'}
+              </ButtonText>
             </Button>
           </Card>
-          {/* <HStack alignSelf="center">
-  <Text size="lg">Already have account </Text>
-  
-  <Link onPress={() => navigation.navigate('Login')} isExternal>
-    <LinkText size="lg">Login</LinkText>
-  </Link>
-</HStack> */}
+        
         </View>
       </SafeAreaView>
     </GluestackUIProvider>

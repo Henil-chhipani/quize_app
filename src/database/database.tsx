@@ -48,7 +48,7 @@ export const initDatabase = async () => {
 
     db.then(tx => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT)',
+        'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT, image TEXT)',
         [],
         () => {
           console.log('Users table created successfully');
@@ -59,7 +59,7 @@ export const initDatabase = async () => {
       );
 
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS Questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, opt1 TEXT, opt2 TEXT, opt3 TEXT, opt4 TEXT, answer TEXT)',
+        'CREATE TABLE IF NOT EXISTS Questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, option1 TEXT, option2 TEXT, option3 TEXT, option4 TEXT, answer TEXT)',
         [],
         () => {
           console.log('Questions table created successfully');
@@ -90,13 +90,14 @@ export const insertUser = async (
   email: string,
   phone: string,
   password: string,
+  image: string
 ) => {
   try {
     const dbInstance = await db;
     console.log("db instance",dbInstance);
     await dbInstance.executeSql(
-      'INSERT INTO Users (name, email, phone, password) VALUES (?, ?, ?, ?)',
-      [name, email, phone, password],
+      'INSERT INTO Users (name, email, phone, password,image) VALUES (?, ?, ?, ?, ?)',
+      [name, email, phone, password,image],
     );
 
     const results = await dbInstance.executeSql(
@@ -158,13 +159,14 @@ export const updateUser = async (
   email: string,
   phone: string,
   password: string,
+  image: string,
   id: number,) => {
   try {
     const dbInstance = await db;
     console.log('db instance', dbInstance);
     await dbInstance.executeSql(
-      'UPDATE Users  SET name = ?, email = ?, phone = ?, password = ? WHERE id = ?',
-      [name, email, phone, password, id],
+      'UPDATE Users  SET name = ?, email = ?, phone = ?, password = ?, image = ? WHERE id = ?',
+      [name, email, phone, password, image ,id],
     );
 
     const results = await dbInstance.executeSql(
@@ -194,23 +196,24 @@ export const deleteUser = async (id: any) => {
 };
 
 
-export const insertProduct = async (
-  productName: any,
-  productPrice: any,
-  productDis: any,
-  productCategory: any,
-  productImg: any,
+export const insertQustion = async (
+  qustion: string,
+  option1: string,
+  option2: string,
+  option3: string,
+  option4: string,
+  answer: string
 ) => {
   try {
     const dbInstance = await db;
     await dbInstance.executeSql(
-      'INSERT INTO Qustions(productName, productPrice, productDis, productCategory, productImg) VALUES (?,?,?,?,?)',
-      [productName, productPrice, productDis, productCategory, productImg],
+      'INSERT INTO Qustions(qustion, option1, option2, option3, option4, answer) VALUES (?,?,?,?,?,?)',
+      [qustion, option1, option2, option3, option4, answer],
     );
 
     const results = await dbInstance.executeSql(
-      'SELECT * FROM Qustions WHERE QustionId = ?',
-      [productName],
+      'SELECT * FROM Qustions WHERE qustion = ?',
+      [qustion],
     );
 
     if (results[0].rows.length > 0) {
@@ -225,7 +228,7 @@ export const insertProduct = async (
 };
 
 
-export const getAllProducts = async () => {
+export const getAllQustions = async () => {
   try {
     const dbInstance = await db;
     const results = await dbInstance.executeSql('SELECT * FROM Qustions');
@@ -233,7 +236,7 @@ export const getAllProducts = async () => {
     for (let i = 0; i < results[0].rows.length; i++) {
       products.push(results[0].rows.item(i));
     }
-    console.log('products is : ', products);
+    console.log('qustions is : ', products);
     return products;
   } catch (error) {
     console.log('Error while fetching product data:', error);
@@ -247,7 +250,7 @@ export const get = async()=>{
   console.log("data: ",results);
 }
 
-export const deleteProduct = async (id) => {
+export const deleteQustion = async (id) => {
   try {
     const dbInstance = await db;
     await dbInstance.executeSql('DELETE FROM Qustions WHERE id = ?', [id]);

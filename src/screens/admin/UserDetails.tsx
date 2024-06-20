@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Alert, FlatList } from 'react-native';
+import { StyleSheet, View, Alert, FlatList, Image } from 'react-native';
 import {
   Card,
   Button,
@@ -25,7 +25,6 @@ export default function UserDetails({navigation}:any) {
   }, []);
 
   const fetchUsers = async () => {
-    console.log("fetch user")
     const usersData = await getAllUsers();
     setUsers(usersData);
   };
@@ -61,6 +60,7 @@ export default function UserDetails({navigation}:any) {
         <Text>Name: {item.name}</Text>
         <Text>Email: {item.email}</Text>
         <Text>Phone: {item.phone}</Text>
+        <Image source={{uri: `data:image/jpeg;base64,${item.image}`}} style={{width:50 , height: 50 }}/>
         <HStack mt="$2" space="md" justifyContent="flex-end" >
         
           <Button size="sm" variant="solid" action="primary" onPress={() => handlEditUser(item)}>
