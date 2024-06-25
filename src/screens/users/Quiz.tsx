@@ -47,7 +47,7 @@ const Quiz = ({ navigation }) => {
     await AsyncStorage.setItem('score', JSON.stringify(score));
     await AsyncStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
     await AsyncStorage.setItem('questions', JSON.stringify(questions));
-    navigation.navigate('UserReport');
+    navigation.replace('UserReport');
   };
 
   const renderQuestion = (question, index) => {

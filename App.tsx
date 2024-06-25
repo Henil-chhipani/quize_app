@@ -22,6 +22,7 @@ export default function App() {
   useEffect(() => {
     initDatabase();
     insetAdmin();
+  
   }, []);
 
   return (

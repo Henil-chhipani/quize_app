@@ -81,17 +81,33 @@ async function createTable(db: any, tableName: any, schema: any) {
 export const insertResult = async (UserId: number, Mark: string) => {
   try {
     const dbInstance = await db;
-    const checkAdminResult = await dbInstance.executeSql(
-      'INSERT INTO Results(UserId, Mark) VALUES(?,?) ',
+
+    const res = await dbInstance.executeSql('SELECT * FROM Results WHERE UserId = ?',[UserId])
+if(!res){
+    await dbInstance.executeSql(
+      'INSERT OR REPLACE INTO Results(UserId, Mark) VALUES (?, ?) ',
       [UserId, Mark],
     );
-    console.log('Result inserted successfully');
-  } catch (err) {
-    console.log('Error in inserting results', err);
+  }else{
+    await dbInstance.executeSql('UPDATE Results SET Mark = ? WHERE UserId = ?',[Mark, UserId])
+  }
+    console.log('Result inserted or updated successfully');
+  } catch (error) {
+    console.error('Error inserting or updating result:', error);
   }
 };
 
-// Assuming a database instance `db` is already initialized
+export const result = async ()=>{
+  const dbInstance = await db;
+  const results = await dbInstance.executeSql(`DROP TABLE Results`);
+  // let res = [];
+  // for (let i = 0; i < results[0].rows.length; i++) {
+  //   res.push(results[0].rows.item(i));
+  // }
+  
+  // console.log(res);
+}
+
 export const getAllUsersWithMarks = async () => {
   try {
     const dbInstance = await db;
