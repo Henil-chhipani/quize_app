@@ -18,14 +18,20 @@ import {
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 
-export default function Admin({navigation}:any)  {
+export default function Admin({navigation}: any) {
+
+  const handleLogout =  ()=>{
+    navigation.replace('Login');
+  }
+
   return (
     <GluestackUIProvider config={config}>
-      <Card size="md" variant="elevated" m="$3" backgroundColor="$green50">
-        <Heading mb="$1" size="md" alignSelf="center">
-          Admin
-        </Heading>
-      </Card>
+      {/* <Card size="md" variant="elevated" m="$3" backgroundColor="$green50"> */}
+      <Heading mb="$5" fontSize={30} alignSelf="center" mt={20}>
+        Admin
+      </Heading>
+
+      {/* </Card> */}
 
       <Card size="md" variant="elevated" m="$3" backgroundColor="$green50">
         <Button
@@ -37,10 +43,9 @@ export default function Admin({navigation}:any)  {
           marginVertical={10}
           borderRadius={15}
           margin={20}
-          onPress={()=>{
-            navigation.navigate('AddUser',{mode:'Add user',item: null})
-          }}
-          >
+          onPress={() => {
+            navigation.navigate('AddUser', {mode: 'Add user', item: null});
+          }}>
           <ButtonText>Create User</ButtonText>
           <ButtonIcon as={AddIcon} />
         </Button>
@@ -52,8 +57,8 @@ export default function Admin({navigation}:any)  {
           size="md"
           variant="solid"
           action="primary"
-          onPress={()=>{
-            navigation.navigate('UserDetails')
+          onPress={() => {
+            navigation.navigate('UserDetails');
           }}
           isDisabled={false}
           isFocusVisible={false}>
@@ -68,6 +73,9 @@ export default function Admin({navigation}:any)  {
           size="md"
           variant="solid"
           action="primary"
+          onPress={() => {
+            navigation.navigate('AddQustions');
+          }}
           isDisabled={false}
           isFocusVisible={false}>
           <ButtonText>Add Qustions</ButtonText>
@@ -82,9 +90,26 @@ export default function Admin({navigation}:any)  {
           variant="solid"
           action="primary"
           isDisabled={false}
-          isFocusVisible={false}>
+          isFocusVisible={false}
+          onPress={() => {
+            navigation.navigate('Report');
+          }}>
           <ButtonText>Report</ButtonText>
+
           <ButtonIcon as={GripVerticalIcon} />
+        </Button>
+        <Button
+          marginVertical={10}
+          margin={20}
+          borderRadius={15}
+          size="sm"
+          variant="solid"
+          action="primary"
+          width={100}
+          isDisabled={false}
+          onPress={handleLogout}
+          isFocusVisible={false}>
+          <ButtonText>Logout </ButtonText>
         </Button>
       </Card>
     </GluestackUIProvider>

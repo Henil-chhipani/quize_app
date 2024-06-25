@@ -10,94 +10,144 @@ const database_size = 200000;
 
 let db: any;
 
-// export const initDatabase = async () => {
-//   try {  
-//     db = SQLite.openDatabase(
-//       database_name,
-//       database_version,
-//       database_displayname,
-//       database_size,
-//     );
-//     console.log('Database opened');
-
-//     db.then(tx => {
-//       tx.executeSql(
-//         'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT)',
-//       );
-      
-//       tx.executeSql(
-//         'CREATE TABLE IF NOT EXISTS Qustions (id INTEGER PRIMARY KEY AUTOINCREMENT, qustion TEXT,opt1 TEXT,opt2 TEXT,opt3 TEXT, opt4 TEXT, answer TEXT)',
-//       );
-//     });
-//     console.log('Table created successfully');
-//   } catch (error) {
-//     console.error('Error initializing database: ', error);
-//   }
-// };
-
-
 export const initDatabase = async () => {
   try {
-     db = SQLite.openDatabase(
+    db = SQLite.openDatabase(
       database_name,
       database_version,
       database_displayname,
-      database_size
+      database_size,
     );
     console.log('Database opened');
+    createTable(
+      db,
+      'Users',
+      `
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      email TEXT,
+      phone TEXT,
+      password TEXT,
+      image TEXT
+    `,
+    ); // only this table is cteate qustions table is not cteated and not showing any log
 
-    db.then(tx => {
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, password TEXT, image TEXT)',
-        [],
-        () => {
-          console.log('Users table created successfully');
-        },
-        (tx, error: any) => {
-          console.error('Error creating Users table: ', error);
-        }
-      );
+    createTable(
+      db,
+      'Questions',
+      `
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      question TEXT,
+      option1 TEXT,
+      option2 TEXT,
+      option3 TEXT,
+      option4 TEXT,
+      answer TEXT
+    `,
+    );
 
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS Questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, option1 TEXT, option2 TEXT, option3 TEXT, option4 TEXT, answer TEXT)',
-        [],
-        () => {
-          console.log('Questions table created successfully');
-        },
-        (tx, error) => {
-          console.error('Error creating Questions table: ', error);
-        }
-      );
-
-
-
-
-    }, (error) => {
-      console.error('Transaction error: ', error);
-    }, () => {
-      console.log('Transaction successful');
-    });
-
+    createTable(
+      db,
+      'Results',
+      `id INTEGER PRIMARY KEY AUTOINCREMENT,
+      UserId INTEGER,
+      Mark TEXT
+    `,
+    );
   } catch (error) {
     console.error('Error initializing database: ', error);
   }
-
 };
 
+async function createTable(db: any, tableName: any, schema: any) {
+  try {
+    await db.then(async (tx: any) => {
+      await tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (${schema})`,
+        [],
+        () => console.log(`${tableName} table created successfully`),
+        (tx: any, error: any) =>
+          console.error(`Error creating ${tableName} table:`, error),
+      );
+    });
+  } catch (error) {
+    console.error(
+      `Error creating ${tableName} table (within transaction):`,
+      error,
+    );
+  }
+}
+
+export const insertResult = async (UserId: number, Mark: string) => {
+  try {
+    const dbInstance = await db;
+    const checkAdminResult = await dbInstance.executeSql(
+      'INSERT INTO Results(UserId, Mark) VALUES(?,?) ',
+      [UserId, Mark],
+    );
+    console.log('Result inserted successfully');
+  } catch (err) {
+    console.log('Error in inserting results', err);
+  }
+};
+
+// Assuming a database instance `db` is already initialized
+export const getAllUsersWithMarks = async () => {
+  try {
+    const dbInstance = await db;
+    const results = await dbInstance.executeSql(`
+      SELECT Users.id, Users.name, Users.email, Results.Mark
+      FROM Users
+      LEFT JOIN Results ON Users.id = Results.UserId
+    `);
+    
+    let users = [];
+    for (let i = 0; i < results[0].rows.length; i++) {
+      users.push(results[0].rows.item(i));
+    }
+    
+    return users;
+  } catch (error) {
+    console.error('Error fetching users with marks:', error);
+    return [];
+  }
+};
+
+
+export const insetAdmin = async () => {
+  try {
+    const dbInstance = await db;
+    const checkAdminResult = await dbInstance.executeSql(
+      'SELECT * FROM Users WHERE name = ?',
+      ['admin'],
+    );
+    if (checkAdminResult[0].rows.length === 0) {
+      await dbInstance.executeSql(
+        'INSERT INTO Users (name, email, phone, password, image) VALUES (?, ?, ?, ?, ?)',
+        ['admin', 'admin@admin.com', '123', '123', null],
+      );
+      console.log('Admin inserted successfully');
+    } else {
+      console.log('Admin already exists');
+    }
+  } catch (err) {
+    console.error('Error inserting admin:', err);
+  }
+};
 
 export const insertUser = async (
   name: string,
   email: string,
   phone: string,
   password: string,
-  image: string
+  image: string,
 ) => {
   try {
     const dbInstance = await db;
-    console.log("db instance",dbInstance);
+    console.log('db instance', dbInstance);
     await dbInstance.executeSql(
       'INSERT INTO Users (name, email, phone, password,image) VALUES (?, ?, ?, ?, ?)',
-      [name, email, phone, password,image],
+      [name, email, phone, password, image],
     );
 
     const results = await dbInstance.executeSql(
@@ -146,7 +196,7 @@ export const getAllUsers = async () => {
     for (let i = 0; i < results[0].rows.length; i++) {
       users.push(results[0].rows.item(i));
     }
-    
+
     return users;
   } catch (error) {
     console.error('Error fetching users: ', error);
@@ -160,13 +210,14 @@ export const updateUser = async (
   phone: string,
   password: string,
   image: string,
-  id: number,) => {
+  id: number,
+) => {
   try {
     const dbInstance = await db;
     console.log('db instance', dbInstance);
     await dbInstance.executeSql(
       'UPDATE Users  SET name = ?, email = ?, phone = ?, password = ?, image = ? WHERE id = ?',
-      [name, email, phone, password, image ,id],
+      [name, email, phone, password, image, id],
     );
 
     const results = await dbInstance.executeSql(
@@ -195,67 +246,65 @@ export const deleteUser = async (id: any) => {
   }
 };
 
-
 export const insertQustion = async (
-  qustion: string,
+  question: string,
   option1: string,
   option2: string,
   option3: string,
   option4: string,
-  answer: string
+  answer: string,
 ) => {
   try {
     const dbInstance = await db;
     await dbInstance.executeSql(
-      'INSERT INTO Qustions(qustion, option1, option2, option3, option4, answer) VALUES (?,?,?,?,?,?)',
-      [qustion, option1, option2, option3, option4, answer],
+      'INSERT INTO Questions(question, option1, option2, option3, option4, answer) VALUES (?,?,?,?,?,?)',
+      [question, option1, option2, option3, option4, answer],
     );
 
     const results = await dbInstance.executeSql(
-      'SELECT * FROM Qustions WHERE qustion = ?',
-      [qustion],
+      'SELECT * FROM Questions WHERE question = ?',
+      [question],
     );
 
     if (results[0].rows.length > 0) {
-      const product = results[0].rows.item(0);
-      console.log('Product inserted successfully:', product);
+      const Qustion = results[0].rows.item(0);
+      console.log('Question inserted successfully:', Qustion);
     } else {
-      console.log('Product inserted but not found in database.');
+      console.log('Question inserted but not found in database.');
     }
   } catch (error) {
-    console.error('Error inserting product:', error);
+    console.error('Error inserting Qustion:', error);
   }
 };
-
 
 export const getAllQustions = async () => {
   try {
     const dbInstance = await db;
-    const results = await dbInstance.executeSql('SELECT * FROM Qustions');
-    let products = [];
+    const results = await dbInstance.executeSql('SELECT * FROM Questions');
+    let questions = [];
     for (let i = 0; i < results[0].rows.length; i++) {
-      products.push(results[0].rows.item(i));
+      questions.push(results[0].rows.item(i));
     }
-    console.log('qustions is : ', products);
-    return products;
+    console.log('Questions is : ', questions);
+    return questions;
   } catch (error) {
-    console.log('Error while fetching product data:', error);
+    console.log('Error while fetching Questions data:', error);
     return [];
   }
 };
 
-export const get = async()=>{
+export const get = async () => {
   const dbInstance = await db;
-  const results  = await dbInstance.executeSql('Truncate table Qustions')
-  console.log("data: ",results);
-}
+  const results = await dbInstance.executeSql('Truncate table Questions');
+  console.log('data: ', results);
+};
 
-export const deleteQustion = async (id) => {
+export const deleteQustion = async id => {
   try {
     const dbInstance = await db;
-    await dbInstance.executeSql('DELETE FROM Qustions WHERE id = ?', [id]);
-    console.log(`Product with id ${id} deleted successfully`);
+    await dbInstance.executeSql('DELETE FROM Questions WHERE id = ?', [id]);
+    console.log(`question with id ${id} deleted successfully`);
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error deleting question:', error);
   }
 };

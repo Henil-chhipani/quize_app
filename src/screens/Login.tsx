@@ -14,21 +14,24 @@ import {
   HStack,
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
-// import {getUserByEmailPassword} from '../database/database';
-// import { useAuth } from '../contexts/AuthContext';
+import {getUserByEmailPassword} from '../database/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const admins = ['admin@admin.com','henil@henil.com'];
+export const admins = ['admin@admin.com'];
 
 export default function Login({navigation}: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-//   const { login } = useAuth();
+
 
   const handleLogin = async () => {
     if (email && password) {
       try {
-        // let user = await getUserByEmailPassword(email, password); // Await the async function call
-        // let user = await login(email, password);
+
+        const user = await getUserByEmailPassword(email,password)
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+
+
         if (!user) {
           console.log("Incorrect email or password");
         } else {
@@ -37,7 +40,7 @@ export default function Login({navigation}: any) {
           if(admins.includes(user.email)){
           navigation.replace("Admin"); }
           else{
-            navigation.replace("Home"); 
+            navigation.replace("UserPage"); 
           }
         }
       } catch (error) {

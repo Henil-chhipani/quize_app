@@ -81,8 +81,6 @@ export default function UserDetails({navigation}:any) {
         <Heading mb="$5" fontSize={30} alignSelf="center">
           Admin Panel
         </Heading>
-    
-    
 
         <FlatList
           data={users}

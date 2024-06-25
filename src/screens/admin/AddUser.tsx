@@ -74,8 +74,8 @@ export default function AddUser({navigation, route}: any) {
       } else {
         await insertUser(name, email, phoneNumber, password, image);
         Alert.alert(
-          'Registration Successful',
-          'You have successfully signed up. Please log in.',
+          'User added',
+          'User added successfully',
           [
             {
               text: 'OK',
