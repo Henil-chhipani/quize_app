@@ -1,6 +1,6 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useState,useEffect} from 'react';
-import {getAllUsers,getAllUsersWithMarks} from '../../database/database';
+import {getAllUsersWithMarks} from '../../database/resultTable';
 import {
   Card,
   Button,

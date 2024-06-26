@@ -15,15 +15,7 @@ const UserPage = ({ navigation, route }: any) => {
         }
     }
 
-    // const handleReset = async () => {
-    //     if(user_id) {
-    //         resetQuiz(user_id)
-    //         if (await AsyncStorage.getItem('attempted_questions') != null) {
-    //             let que_list = JSON.parse(await AsyncStorage.getItem('attempted_questions') ?? "");
-    //             await AsyncStorage.setItem('attempted_questions', JSON.stringify(que_list.filter((e: any) => e.user_id != user_id)))
-    //         }
-    //     }
-    // }
+  
     const handleLogout =  ()=>{
         navigation.replace('Login');
       }
@@ -31,15 +23,7 @@ const UserPage = ({ navigation, route }: any) => {
         navigation.navigate('Quiz')
     }
 
-    // useEffect(() => {
-    //     getUserId();
-    // }, [])
 
-    // useEffect(() => {
-    //     if(route.params && route.params.mode === "VIEW_REPORT") {
-    //         navigation.navigate('Report', { id: user_id })
-    //     }
-    // }, [user_id, route])
 
     return (
         
@@ -59,7 +43,7 @@ const UserPage = ({ navigation, route }: any) => {
           borderRadius={15}
           size="sm"
           variant="solid"
-          action="primary"
+          action="negative"
           width={100}
           isDisabled={false}
           onPress={handleLogout}

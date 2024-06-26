@@ -99,17 +99,18 @@ export default function Admin({navigation}: any) {
           <ButtonIcon as={GripVerticalIcon} />
         </Button>
         <Button
-          marginVertical={10}
+          marginTop={50}
           margin={20}
           borderRadius={15}
           size="sm"
           variant="solid"
-          action="primary"
+          action="negative"
           width={100}
+          alignSelf="center"
           isDisabled={false}
           onPress={handleLogout}
           isFocusVisible={false}>
-          <ButtonText>Logout </ButtonText>
+          <ButtonText >Logout </ButtonText>
         </Button>
       </Card>
     </GluestackUIProvider>

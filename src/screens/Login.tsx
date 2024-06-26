@@ -14,7 +14,7 @@ import {
   HStack,
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
-import {getUserByEmailPassword} from '../database/database';
+import {getUserByEmailPassword} from '../database/userTable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const admins = ['admin@admin.com'];

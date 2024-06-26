@@ -2,7 +2,7 @@ import { Alert, Image, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Heading, Card, ScrollView } from '@gluestack-ui/themed';
-import { getUserByEmailPassword } from '../../database/database';
+
 
 export default function Profile() {
   const [user, setUser] = useState(null);

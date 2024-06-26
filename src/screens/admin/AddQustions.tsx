@@ -39,7 +39,7 @@ import {
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {insertQustion, insertUser, updateUser} from '../../database/database';
+import {insertQustion} from '../../database/qustionTable';
 import {ScrollView} from 'react-native-gesture-handler';
 
 export default function AddQustions({navigation, route}: any) {

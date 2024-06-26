@@ -1,8 +1,8 @@
 // screens/SplashScreen.js
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator,Image, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUserByEmailPassword } from '../database/database';
+import { getUserByEmailPassword } from '../database/userTable';
 
 export default function SplashScreen({ navigation }:any) {
   useEffect(() => {
@@ -32,10 +32,13 @@ export default function SplashScreen({ navigation }:any) {
   }, [navigation]);
 
   return (
+    <>
+    <StatusBar backgroundColor={"#050A30"} barStyle="light-content" />
     <View style={styles.container}>
-      <Text style={styles.title}>Loading...</Text>
+      <Image  source={require('../../assets/splashscreen.png')} />
       <ActivityIndicator size="large" color="#0000ff" />
     </View>
+    </>
   );
 }
 
@@ -44,6 +47,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: "#050A30",
   },
   title: {
     fontSize: 24,

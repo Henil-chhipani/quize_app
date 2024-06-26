@@ -2,7 +2,9 @@ import { Alert, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Heading, View, ScrollView, ButtonText } from '@gluestack-ui/themed';
 import { Text } from '@gluestack-ui/themed';
-import { getAllQustions, insertResult } from '../../database/database';
+import { getAllQustions } from '../../database/qustionTable';
+import { insertResult } from '../../database/resultTable';
+
 import RadioButtonRN from 'radio-buttons-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

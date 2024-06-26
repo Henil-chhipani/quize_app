@@ -5,7 +5,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Admin from './src/screens/admin/Admin';
 import AddUser from './src/screens/admin/AddUser';
-import {initDatabase, insetAdmin} from './src/database/database';
+// import {initDatabase, insetAdmin} from './src/database/database';
 import UserDetails from './src/screens/admin/UserDetails';
 import AddQustions from './src/screens/admin/AddQustions';
 import Report from './src/screens/admin/Report';
@@ -16,11 +16,20 @@ import {GluestackUIProvider} from '@gluestack-ui/themed';
 import UserReport from './src/screens/users/UserReport';
 import Profile from './src/screens/users/Profile';
 import SplashScreen from './src/screens/SplashScreen';
+
+import { initUserTable,insetAdmin } from './src/database/userTable';
+import { initQuestionTable } from './src/database/qustionTable';
+import { initResultTable, result } from './src/database/resultTable';
+
 const Stack = createStackNavigator();
 
 export default function App() {
   useEffect(() => {
-    initDatabase();
+
+    initQuestionTable();
+    initUserTable();
+    initResultTable();
+  result();
     insetAdmin();
   
   }, []);

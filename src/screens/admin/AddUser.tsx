@@ -27,7 +27,7 @@ import {
 } from '@gluestack-ui/themed';
 import {config} from '@gluestack-ui/config';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {insertUser, updateUser} from '../../database/database';
+import {insertUser, updateUser} from '../../database/userTable';
 
 export default function AddUser({navigation, route}: any) {
   const [name, setName] = useState('');
