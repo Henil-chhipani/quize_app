@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import React from 'react';
 import {
   Card,
@@ -33,7 +33,7 @@ export default function Admin({navigation}: any) {
 
       {/* </Card> */}
 
-      <Card size="md" variant="elevated" m="$3" backgroundColor="$green50">
+      <Card size="md" variant="elevated" m="$3" backgroundColor="$green50" overflow="hidden">
         <Button
           size="md"
           variant="solid"
@@ -112,6 +112,7 @@ export default function Admin({navigation}: any) {
           isFocusVisible={false}>
           <ButtonText >Logout </ButtonText>
         </Button>
+      
       </Card>
     </GluestackUIProvider>
   );

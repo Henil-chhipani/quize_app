@@ -33,9 +33,15 @@ export default function SplashScreen({ navigation }:any) {
 
   return (
     <>
-    <StatusBar backgroundColor={"#050A30"} barStyle="light-content" />
+    <StatusBar backgroundColor={"#fff"} barStyle="light-content" />
     <View style={styles.container}>
-      <Image  source={require('../../assets/splashscreen.png')} />
+      <View style={{height:190, width:200, overflow:"hidden"}}>
+    <Image
+      height={200}
+      width={200}
+      source={{uri: 'https://www.shutterstock.com/image-vector/quiz-logo-time-label-question-260nw-2299277831.jpg'}}
+      
+    /></View>
       <ActivityIndicator size="large" color="#0000ff" />
     </View>
     </>
@@ -47,7 +53,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "#050A30",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
